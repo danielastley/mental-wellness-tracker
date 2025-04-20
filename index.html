@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Wellness Check-in</title>
+    <!-- Link to the CSS file -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>Daily Check-in</h1>
+
+    <!-- The form container for all inputs -->
+    <form id="checkinForm">
+
+        <!-- Mood Card -->
+        <div class="metric-card">
+            <label for="moodSlider">How is your mood today?</label>
+            <input type="range" id="moodSlider" name="mood" min="1" max="5" step="1" value="3">
+            <span class="slider-value" id="moodValueLabel">Neutral</span>
+            <!-- We'll add dynamic label text later with JS -->
+        </div>
+
+        <!-- Energy Card -->
+        <div class="metric-card">
+            <label for="energySlider">What’s your energy level?</label>
+            <input type="range" id="energySlider" name="energy" min="1" max="5" step="1" value="3">
+            <span class="slider-value" id="energyValueLabel">Balanced</span>
+            <!-- We'll add dynamic label text later with JS -->
+        </div>
+
+        <!-- Anxiety/Irritability Card -->
+        <div class="metric-card">
+            <label for="anxietySlider">How anxious or irritable do you feel?</label>
+            <input type="range" id="anxietySlider" name="anxiety" min="1" max="5" step="1" value="3">
+            <span class="slider-value" id="anxietyValueLabel">Moderate</span>
+            <!-- We'll add dynamic label text later with JS -->
+        </div>
+
+        <!-- Sleep Card -->
+        <div class="metric-card">
+            <label>How did you sleep?</label>
+            <div>
+                <label for="sleepHoursInput">Hours Slept:</label>
+                <input type="number" id="sleepHoursInput" name="sleep_hours" min="0" max="24" step="1" value="8">
+                <!-- Note: Max 24 is more realistic than 12 -->
+            </div>
+            <div>
+                <label for="sleepRestfulnessSlider">Restfulness:</label>
+                <input type="range" id="sleepRestfulnessSlider" name="sleep_restfulness" min="1" max="5" step="1" value="3">
+                <span class="slider-value" id="sleepRestfulnessValueLabel">Okay</span>
+                 <!-- We'll add dynamic label text later with JS -->
+            </div>
+        </div>
+
+        <!-- Focus Card -->
+        <div class="metric-card">
+            <label for="focusSlider">How clear or busy is your mind?</label>
+            <input type="range" id="focusSlider" name="focus" min="1" max="5" step="1" value="3">
+            <span class="slider-value" id="focusValueLabel">Neutral</span>
+             <!-- We'll add dynamic label text later with JS -->
+        </div>
+
+        <!-- Optional Notes Card -->
+        <div class="metric-card">
+            <label for="notesTextarea">Optional Notes:</label>
+            <textarea id="notesTextarea" name="notes" rows="3" placeholder="Any specific thoughts or events?"></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submitButton">Done! ✅</button>
+
+    </form>
+
+    <!-- Link to the JavaScript file - MUST be at the end of body -->
+    <script src="script.js"></script>
+</body>
+</html>
