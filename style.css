@@ -101,3 +101,88 @@ textarea {
 #submitButton:hover {
     background-color: #4cae4c; /* Darker green on hover */
 }
+
+/* --- Timeline Styles --- */
+#timelineContainer {
+    width: 90%;
+    max-width: 700px; /* Can be wider than chart */
+    margin: 30px auto;
+    padding: 15px;
+    background-color: #f8f9fa; /* Light background for timeline area */
+    border-radius: 8px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    text-align: center; /* Center the heading */
+}
+
+#timelineContainer h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #555;
+    font-size: 1.2em;
+}
+
+#timelineDots {
+    display: flex; /* Arrange dots in a row */
+    flex-wrap: wrap; /* Allow wrapping if too many dots */
+    justify-content: center; /* Center dots horizontally */
+    gap: 10px; /* Spacing between dots */
+    padding: 10px 0;
+}
+
+.timeline-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%; /* Make it circular */
+    border: 2px solid #ccc; /* Default border */
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    background-color: #e0e0e0; /* Default background */
+    display: flex; /* For centering text if needed */
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em; /* Small font for potential text inside */
+    color: white;
+    position: relative; /* For tooltip positioning */
+}
+
+/* Style for the currently selected dot */
+.timeline-dot.selected {
+    border-color: #007bff; /* Highlight border */
+    transform: scale(1.2); /* Make it slightly larger */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.timeline-dot:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+}
+
+/* --- Tooltip for dot (optional but helpful) --- */
+.timeline-dot .tooltip-text {
+    visibility: hidden;
+    width: 100px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position above the dot */
+    left: 50%;
+    margin-left: -50px; /* Center the tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.8em;
+}
+
+.timeline-dot:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* --- Example Mood Color Coding --- */
+.timeline-dot[data-mood='1'] { background-color: #dc3545; border-color: #b02a37; } /* Red */
+.timeline-dot[data-mood='2'] { background-color: #fd7e14; border-color: #c66310; } /* Orange */
+.timeline-dot[data-mood='3'] { background-color: #ffc107; border-color: #c79606; } /* Yellow */
+.timeline-dot[data-mood='4'] { background-color: #28a745; border-color: #208538; } /* Green */
+.timeline-dot[data-mood='5'] { background-color: #0d6efd; border-color: #0a58ca; } /* Blue */
