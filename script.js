@@ -69,21 +69,58 @@ document.addEventListener('DOMContentLoaded', () => {
             notes: notesTextarea.value.trim() // Get notes, remove extra whitespace
         };
 
-        // --- Temporary Action: Log data to console ---
-        console.log("Check-in Data Submitted:");
-        console.log(checkInData);
-        alert("Check-in recorded! Data logged to console."); // Simple user feedback
+ // --- NEW: Save data to localStorage ---
+ try {
+    // Define the key we'll use to store our data in localStorage
+    const storageKey = 'wellnessCheckins';
 
-        // --- TODO (Later Steps) ---
-        // 1. Save `checkInData` to localStorage.
-        // 2. Optionally, send `checkInData` to a server.
-        // 3. Clear the form or provide better visual feedback.
-        // 4. Navigate to the dashboard view (once we build it).
+    // 1. Get existing data (if any)
+    const existingDataString = localStorage.getItem(storageKey);
 
-        // For now, we could optionally reset the form fields
-        // checkinForm.reset();
-        // updateLabel(moodSlider, moodValueLabel, moodLabels); // Re-initialize labels if resetting
-        // ... re-initialize other labels ...
-    });
+    // 2. Parse existing data or initialize an empty array
+    let checkins = [];
+    if (existingDataString) {
+        checkins = JSON.parse(existingDataString);
+        // Basic validation: ensure it's an array
+        if (!Array.isArray(checkins)) {
+            console.warn("Invalid data found in localStorage, resetting.");
+            checkins = [];
+        }
+    }
+
+    // 3. Add the new check-in data to the array
+    checkins.push(checkInData);
+
+    // 4. Convert the updated array back to a JSON string
+    const updatedDataString = JSON.stringify(checkins);
+
+    // 5. Store the updated JSON string in localStorage
+    localStorage.setItem(storageKey, updatedDataString);
+
+    // --- Provide User Feedback ---
+    console.log("Check-in saved successfully to localStorage:", checkInData);
+    alert("Check-in saved! 🎉"); // Give positive feedback
+
+    // --- Optional: Reset the form after successful submission ---
+    checkinForm.reset(); // Resets all form fields to their default values
+    // Re-initialize labels after reset
+    updateLabel(moodSlider, moodValueLabel, moodLabels);
+    updateLabel(energySlider, energyValueLabel, energyLabels);
+    updateLabel(anxietySlider, anxietyValueLabel, anxietyLabels);
+    updateLabel(sleepRestfulnessSlider, sleepRestfulnessValueLabel, sleepRestfulnessLabels);
+    updateLabel(focusSlider, focusValueLabel, focusLabels);
+    // Note: The sleep hours input and textarea will also be reset by form.reset()
+
+} catch (error) {
+    // --- Handle Potential Errors (e.g., localStorage full, invalid JSON) ---
+    console.error("Error saving check-in data:", error);
+    alert("Sorry, there was an error saving your check-in. Please try again.");
+}
+
+// --- TODO (Later Steps) ---
+// 1. Build the Dashboard/Visualization screen.
+// 2. Load data from localStorage onto the Dashboard.
+// 3. Implement sending data to your server (if desired).
+});
 
 }); // End of DOMContentLoaded listener
