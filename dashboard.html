@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellness Dashboard</title>
+    <!-- Link to the SAME CSS file -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Basic styling for the chart container -->
+    <style>
+        #chartContainer {
+            width: 90%; /* Adjust width as needed */
+            max-width: 600px; /* Max width for larger screens */
+            margin: 30px auto; /* Center the chart container */
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        #noDataMessage {
+            text-align: center;
+            color: #777;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Your Mood Map</h1>
+    <p><a href="index.html">Go to Daily Check-in</a></p>
+
+    <!-- Container for the chart -->
+    <div id="chartContainer">
+        <!-- Canvas element where Chart.js will draw the chart -->
+        <canvas id="moodRadarChart"></canvas>
+    </div>
+
+    <!-- Placeholder message if no data is found -->
+    <div id="noDataMessage" style="display: none;">
+        <p>No check-in data found yet. Go make your first entry!</p>
+    </div>
+
+    <!-- Load Chart.js library from a CDN (Content Delivery Network) -->
+    <!-- Make sure you have an internet connection for this to work -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Link to OUR dashboard JavaScript file -->
+    <script src="dashboard.js"></script>
+
+</body>
+</html>
