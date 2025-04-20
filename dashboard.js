@@ -1,32 +1,64 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Keep existing element selections
     const storageKey = 'wellnessCheckins';
     const canvasElement = document.getElementById('moodRadarChart');
     const chartContainer = document.getElementById('chartContainer');
     const noDataMessage = document.getElementById('noDataMessage');
-    const timelineDotsContainer = document.getElementById('timelineDots'); // Get timeline container
+    const timelineDotsContainer = document.getElementById('timelineDots');
+    const alertMessageDiv = document.getElementById('alertMessage'); // Get the alert div
 
-    let wellnessChart = null; // Variable to hold the Chart instance
-    let checkins = []; // To store loaded check-ins
+    let wellnessChart = null;
+    let checkins = [];
 
-    // --- Utility Functions ---
+    // --- Utility Functions (keep normalizeSleepHours) ---
     function normalizeSleepHours(hours) {
-        if (hours === undefined || hours === null) return 3; // Handle missing data
-        if (hours <= 2) return 1;
-        if (hours <= 4) return 2;
-        if (hours <= 6) return 3;
-        if (hours <= 8) return 4;
-        if (hours >= 9) return 5;
-        return 3; // Default
+        // ... (keep existing function) ...
     }
 
-    // --- Function to Update the Chart ---
+    // --- NEW: Function to Check for Alerts ---
+    function checkAlerts(checkinData) {
+        if (!alertMessageDiv || !checkinData) return;
+
+        let alertText = "";
+        const { mood, energy, anxiety, sleep_hours } = checkinData; // Destructure for easier access
+
+        // Define risk patterns (adjust thresholds as needed)
+        const maniaRisk = (sleep_hours !== undefined && sleep_hours <= 3) && energy >= 4; // Example: Low sleep + High energy
+        const depressionRisk = mood <= 1 && energy <= 2; // Example: Very low mood + Low energy
+        const highAnxiety = anxiety >= 4; // Example: High anxiety
+
+        // Build the alert message
+        if (maniaRisk && depressionRisk) {
+            alertText = "Patterns suggest potential risk for a mixed state. Please review your data carefully.";
+        } else if (maniaRisk) {
+            alertText = "Patterns suggest potential mania risk (low sleep, high energy). Please review your data carefully.";
+        } else if (depressionRisk) {
+            alertText = "Patterns suggest potential depression risk (low mood, low energy). Please review your data carefully.";
+        } else if (highAnxiety) {
+            // Optional: Alert for high anxiety alone
+            // alertText = "High level of anxiety/irritability detected. Remember coping strategies.";
+        }
+
+        // Show or hide the alert div
+        if (alertText) {
+            alertMessageDiv.textContent = alertText;
+            alertMessageDiv.style.display = 'block';
+             console.log("Alert displayed:", alertText);
+        } else {
+            alertMessageDiv.style.display = 'none';
+             console.log("No alert conditions met.");
+        }
+    }
+
+
+    // --- Function to Update the Chart (Modified) ---
     function updateChart(checkinData, index) {
-        if (!wellnessChart || !checkinData) return; // Safety check
+        if (!wellnessChart || !checkinData) return;
 
         const normalizedSleep = normalizeSleepHours(checkinData.sleep_hours);
         const chartDate = new Date(checkinData.timestamp).toLocaleDateString();
 
-        // Update chart data
+        // Update the USER'S data dataset (index 0)
         wellnessChart.data.datasets[0].data = [
             checkinData.mood,
             checkinData.energy,
@@ -34,122 +66,129 @@ document.addEventListener('DOMContentLoaded', () => {
             normalizedSleep,
             checkinData.focus
         ];
-        wellnessChart.data.datasets[0].label = `Check-in: ${chartDate}`; // Update label
+        wellnessChart.data.datasets[0].label = `Check-in: ${chartDate}`;
 
         // Refresh the chart
         wellnessChart.update();
 
-        // Update selected dot style
+        // Update selected dot style (keep this logic)
         document.querySelectorAll('.timeline-dot').forEach((dot, dotIndex) => {
-            if (dotIndex === index) {
-                dot.classList.add('selected');
-            } else {
-                dot.classList.remove('selected');
-            }
+            dot.classList.toggle('selected', dotIndex === index);
         });
-         console.log(`Chart updated to show check-in from ${chartDate}`);
+
+        // --- NEW: Check for alerts based on the currently displayed data ---
+        checkAlerts(checkinData);
+
+        console.log(`Chart updated to show check-in from ${chartDate}`);
     }
 
-    // --- Function to Create Timeline Dots ---
+    // --- Function to Create Timeline Dots (keep as is) ---
     function createTimelineDots(checkinsData) {
-        if (!timelineDotsContainer) return;
-        timelineDotsContainer.innerHTML = ''; // Clear any existing dots
-
-        checkinsData.forEach((checkin, index) => {
-            const dot = document.createElement('span');
-            dot.classList.add('timeline-dot');
-            dot.dataset.index = index; // Store index to retrieve data later
-            dot.dataset.mood = checkin.mood; // Add mood data for CSS color styling
-
-            // Add tooltip
-            const tooltip = document.createElement('span');
-            tooltip.classList.add('tooltip-text');
-            tooltip.textContent = new Date(checkin.timestamp).toLocaleDateString();
-            dot.appendChild(tooltip);
-
-            // Add click listener
-            dot.addEventListener('click', () => {
-                updateChart(checkin, index); // Update chart with data for this dot's index
-            });
-
-            timelineDotsContainer.appendChild(dot);
-        });
-         console.log(`${checkinsData.length} timeline dots created.`);
+        // ... (keep existing function) ...
     }
 
-    // --- Main Logic ---
+    // --- Main Logic (Modified for Baseline Dataset) ---
     function initializeDashboard() {
-        // 1. Load Data
+        // 1. Load Data (keep as is)
         const checkinsString = localStorage.getItem(storageKey);
-        if (checkinsString) {
-            try {
-                checkins = JSON.parse(checkinsString);
-                if (!Array.isArray(checkins)) checkins = [];
-            } catch (error) {
-                console.error("Error parsing check-in data:", error);
-                checkins = [];
-            }
-        }
+        // ... (keep parsing logic) ...
 
-        // 2. Check if Data Exists
-        if (checkins.length === 0) {
-            console.log("No check-in data found.");
-            if (chartContainer) chartContainer.style.display = 'none';
-            if (timelineContainer) timelineContainer.style.display = 'none'; // Hide timeline too
-            if (noDataMessage) noDataMessage.style.display = 'block';
+        // 2. Check if Data Exists (keep as is)
+         if (checkins.length === 0) {
+            // ... (keep no data logic) ...
             return;
         } else {
-             // Ensure chart and timeline are visible if data exists
-             if (chartContainer) chartContainer.style.display = 'block';
-             if (timelineContainer) timelineContainer.style.display = 'block'; // Show timeline
-             if (noDataMessage) noDataMessage.style.display = 'none';
+            // ... (keep show elements logic) ...
         }
 
-        // 3. Get Latest Check-in for Initial View
+        // 3. Get Latest Check-in for Initial View (keep as is)
         const latestCheckin = checkins[checkins.length - 1];
         const latestIndex = checkins.length - 1;
 
-        // 4. Prepare Initial Chart Data & Options (same as before)
+        // --- 4. Prepare Initial Chart Data & Options (MODIFIED) ---
+
+        // Define the baseline data points (adjust as needed for "normal")
+        const baselineData = {
+            mood: 3,
+            energy: 3,
+            anxiety: 2,
+            sleep_hours_normalized: 4, // e.g., representing 7-8 hours
+            focus: 3
+        };
+
         const initialChartData = {
             labels: ['Mood', 'Energy', 'Anxiety', 'Sleep (Hrs)', 'Focus'],
-            datasets: [{
-                // Data and label will be set initially here, and updated by updateChart()
-                label: '', // Will be set below
-                data: [],  // Will be set below
-                fill: true,
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgb(54, 162, 235)',
-                pointBackgroundColor: 'rgb(54, 162, 235)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgb(54, 162, 235)'
-            }]
+            datasets: [
+                { // Dataset 0: User's data (will be updated by updateChart)
+                    label: '', // Set by updateChart
+                    data: [],  // Set by updateChart
+                    fill: true,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)', // User: Blue fill
+                    borderColor: 'rgb(54, 162, 235)',          // User: Blue border
+                    pointBackgroundColor: 'rgb(54, 162, 235)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(54, 162, 235)',
+                    order: 1 // Ensure user data is drawn on top
+                },
+                { // Dataset 1: Baseline data (static)
+                    label: 'Baseline (Example)',
+                    data: [
+                        baselineData.mood,
+                        baselineData.energy,
+                        baselineData.anxiety,
+                        baselineData.sleep_hours_normalized,
+                        baselineData.focus
+                    ],
+                    fill: false, // Don't fill the baseline area
+                    borderColor: 'rgba(108, 117, 125, 0.5)', // Faint gray border
+                    borderDash: [5, 5], // Make it dashed
+                    pointRadius: 0, // Hide points for baseline
+                    pointHitRadius: 0, // Prevent hover/tooltip on baseline points
+                    order: 2 // Drawn behind user data
+                }
+            ]
         };
         const chartOptions = {
             scales: { r: { angleLines: { display: true }, suggestedMin: 1, suggestedMax: 5, ticks: { stepSize: 1 }, pointLabels: { font: { size: 14 } } } },
-            plugins: { legend: { position: 'top' }, tooltip: { enabled: true } },
-            animation: false // Optional: Disable animation for faster updates on click
+            plugins: {
+                legend: {
+                     position: 'top',
+                     labels: {
+                         // Optional: Filter out baseline from interactive legend clicks if desired
+                         // filter: function(legendItem, chartData) { return legendItem.datasetIndex === 0; }
+                     }
+                },
+                tooltip: {
+                    enabled: true,
+                    // Optional: Only show tooltips for the user's dataset
+                    filter: function(tooltipItem) {
+                        return tooltipItem.datasetIndex === 0;
+                    }
+                }
+            },
+            animation: false
         };
 
-        // 5. Create the Chart Instance
+        // 5. Create the Chart Instance (keep as is)
         if (canvasElement) {
             const ctx = canvasElement.getContext('2d');
-            wellnessChart = new Chart(ctx, { // Assign to our global variable
+            wellnessChart = new Chart(ctx, {
                 type: 'radar',
                 data: initialChartData,
                 options: chartOptions
             });
-            console.log("Chart instance created.");
+            console.log("Chart instance created with baseline.");
 
-            // Draw the initial chart state with the latest data
+            // Draw the initial chart state with the latest data (calls updateChart, which now also calls checkAlerts)
             updateChart(latestCheckin, latestIndex);
 
         } else {
             console.error("Canvas element 'moodRadarChart' not found.");
-            return; // Stop if canvas is missing
+            return;
         }
 
-        // 6. Create the Timeline Dots
+        // 6. Create the Timeline Dots (keep as is)
         createTimelineDots(checkins);
     }
 
