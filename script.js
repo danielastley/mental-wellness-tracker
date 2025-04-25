@@ -125,63 +125,86 @@ $(document).ready(function() {
     prevBtn.addEventListener('click', () => navigatePage(-1));
     nextBtn.addEventListener('click', () => navigatePage(1));
 
-    // --- 8. Form Submission (MODIFIED) ---
+    // --- 8. Form Submission (SEND TO SERVER) ---
     checkinForm.addEventListener('submit', (event) => {
-        event.preventDefault();
+        event.preventDefault(); // Prevent default page reload
 
-        // REMOVED: mapSliderValueToScale function
-
-        // Create the check-in data object - SAVE 0-100 VALUES DIRECTLY
+        // Create the check-in data object (using 0-100 values)
         const checkInData = {
-             // Storing UTC timestamp remains best practice. Display formatting happens later.
-            timestamp: new Date().toISOString(),
-            mood: parseInt(moodValueInputEl.value),         // Save 0-100
-            energy: parseInt(energyValueInputEl.value),       // Save 0-100
-            anxiety: parseInt(anxietyValueInputEl.value),     // Save 0-100
-            sleep_hours: parseFloat(sleepHoursInput.value) || 0, // Still direct value
-            sleep_restfulness: parseInt(restfulnessValueInputEl.value), // Save 0-100
-            focus: parseInt(focusValueInputEl.value),       // Save 0-100
+            timestamp: new Date().toISOString(), // UTC Standard
+            mood: parseInt(moodValueInputEl.value),
+            energy: parseInt(energyValueInputEl.value),
+            anxiety: parseInt(anxietyValueInputEl.value),
+            sleep_hours: parseFloat(sleepHoursInput.value) || 0,
+            sleep_restfulness: parseInt(restfulnessValueInputEl.value),
+            focus: parseInt(focusValueInputEl.value),
             notes: notesTextarea.value.trim()
         };
 
-         // --- Save data to localStorage (Keep existing logic) ---
-        try {
-            const storageKey = 'wellnessCheckins';
-            const existingDataString = localStorage.getItem(storageKey);
-            let checkins = [];
-            if (existingDataString) {
-                checkins = JSON.parse(existingDataString);
-                if (!Array.isArray(checkins)) { checkins = []; }
+        // --- NEW: Send data to server using fetch ---
+        console.log("Attempting to send data to server:", checkInData);
+        submitButton.disabled = true; // Disable button during submission
+        submitButton.textContent = 'Saving...';
+
+        fetch('save_checkin.php', { // URL of your PHP script on the SAME server
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Tell server we're sending JSON
+                'Accept': 'application/json'       // Tell server we expect JSON back
+            },
+            body: JSON.stringify(checkInData) // Convert JS object to JSON string
+        })
+        .then(response => {
+            // Check if the response status indicates success (e.g., 200 OK)
+            if (!response.ok) {
+                 // If server response is not ok, try to get error message, then throw
+                 return response.json().catch(() => { // Try parsing JSON error first
+                      throw new Error(`Server responded with status ${response.status}`);
+                 }).then(errorData => {
+                     throw new Error(errorData.message || `Server responded with status ${response.status}`);
+                 });
             }
-            checkins.push(checkInData);
-            const updatedDataString = JSON.stringify(checkins);
-            localStorage.setItem(storageKey, updatedDataString);
+            return response.json(); // Parse the JSON response from PHP
+        })
+        .then(data => {
+            // Check the status message from our PHP script
+            if (data.status === 'success') {
+                console.log("Server confirmed save:", data.message);
+                alert("Check-in saved! 🎉");
 
-            console.log("Check-in saved (0-100 scale):", checkInData);
-            alert("Check-in saved! 🎉");
+                // --- Reset form (same logic as before) ---
+                 moodValueInputEl.value = 50;
+                 energyValueInputEl.value = 50;
+                 anxietyValueInputEl.value = 50;
+                 restfulnessValueInputEl.value = 50;
+                 focusValueInputEl.value = 50;
+                 sleepHoursInput.value = 8;
+                 notesTextarea.value = '';
 
-            // --- Reset form (Keep existing logic) ---
-            moodValueInputEl.value = 50;
-            energyValueInputEl.value = 50;
-            anxietyValueInputEl.value = 50;
-            restfulnessValueInputEl.value = 50;
-            focusValueInputEl.value = 50;
-            sleepHoursInput.value = 8;
-            notesTextarea.value = '';
+                 $("#moodSliderContainer").roundSlider("option", "value", 50);
+                 $("#energySliderContainer").roundSlider("option", "value", 50);
+                 $("#anxietySliderContainer").roundSlider("option", "value", 50);
+                 $("#restfulnessSliderContainer").roundSlider("option", "value", 50);
+                 $("#focusSliderContainer").roundSlider("option", "value", 50);
 
-            $("#moodSliderContainer").roundSlider("option", "value", 50);
-            $("#energySliderContainer").roundSlider("option", "value", 50);
-            $("#anxietySliderContainer").roundSlider("option", "value", 50);
-            $("#restfulnessSliderContainer").roundSlider("option", "value", 50);
-            $("#focusSliderContainer").roundSlider("option", "value", 50);
+                 showPage(0); // Navigate back to the first page
 
-            showPage(0); // Navigate back to the first page
-
-        } catch (error) {
+            } else {
+                 // Server reported an error in its JSON response
+                 throw new Error(data.message || 'Server reported an unspecified error.');
+            }
+        })
+        .catch(error => {
+            // Handle network errors or errors thrown from .then blocks
             console.error("Error saving check-in data:", error);
-            alert("Sorry, there was an error saving your check-in.");
-        }
-    });
+            alert(`Sorry, there was an error saving your check-in: ${error.message}`);
+        })
+        .finally(() => {
+             // Re-enable button regardless of success or failure
+             submitButton.disabled = false;
+             submitButton.textContent = 'Done! ✅';
+        });
+    }); // End of submit listener
 
 
     // --- 9. Initial Setup (Keep as is) ---
