@@ -1,2 +1,5 @@
 # macOS FInder specific files
 .DS_Store
+
+# Runtime data directory
+/data/
