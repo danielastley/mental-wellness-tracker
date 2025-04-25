@@ -1,126 +1,193 @@
-// Wait for the HTML document to be fully loaded before running the script
-document.addEventListener('DOMContentLoaded', () => {
+$(document).ready(function() {
 
-    // --- 1. Select HTML Elements ---
+    // --- 1. Select DOM Elements (Keep as is) ---
     const checkinForm = document.getElementById('checkinForm');
-
-    // Sliders
-    const moodSlider = document.getElementById('moodSlider');
-    const energySlider = document.getElementById('energySlider');
-    const anxietySlider = document.getElementById('anxietySlider');
-    const sleepRestfulnessSlider = document.getElementById('sleepRestfulnessSlider');
-    const focusSlider = document.getElementById('focusSlider');
-
-    // Label Spans (to display slider values)
-    const moodValueLabel = document.getElementById('moodValueLabel');
-    const energyValueLabel = document.getElementById('energyValueLabel');
-    const anxietyValueLabel = document.getElementById('anxietyValueLabel');
-    const sleepRestfulnessValueLabel = document.getElementById('sleepRestfulnessValueLabel');
-    const focusValueLabel = document.getElementById('focusValueLabel');
-
-    // Other Inputs
+    const pages = document.querySelectorAll('.page');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitButton = document.getElementById('submitButton');
+    const moodDescriptionEl = document.getElementById('moodDescription');
+    const moodValueInputEl = document.getElementById('moodValueInput');
+    const energyDescriptionEl = document.getElementById('energyDescription');
+    const energyValueInputEl = document.getElementById('energyValueInput');
+    const anxietyDescriptionEl = document.getElementById('anxietyDescription');
+    const anxietyValueInputEl = document.getElementById('anxietyValueInput');
+    const restfulnessDescriptionEl = document.getElementById('restfulnessDescription');
+    const restfulnessValueInputEl = document.getElementById('restfulnessValueInput');
+    const focusDescriptionEl = document.getElementById('focusDescription');
+    const focusValueInputEl = document.getElementById('focusValueInput');
     const sleepHoursInput = document.getElementById('sleepHoursInput');
     const notesTextarea = document.getElementById('notesTextarea');
 
-    // --- 2. Define Label Mappings ---
-    // Store the text labels for each slider value (1-5)
-    // Note: Index 0 is unused, we use indices 1-5 to match slider values
-    const moodLabels = ["", "Severely Depressed", "Low Mood", "Neutral", "Elevated", "Euphoric"];
-    const energyLabels = ["", "Exhausted", "Low Energy", "Balanced", "High Energy", "Over-energized"];
-    const anxietyLabels = ["", "Calm", "Slightly Anxious", "Moderate", "Very Anxious", "Panicked/Frustrated"];
-    const sleepRestfulnessLabels = ["", "Exhausted", "Poorly Rested", "Okay", "Well Rested", "Rested"];
-    const focusLabels = ["", "Brain Fog/Stuck", "Distracted", "Neutral", "Sharp", "Racing Thoughts"];
+    // --- 2. Pagination State (Keep as is) ---
+    let currentPageIndex = 0;
+    const totalPages = pages.length;
 
-    // --- 3. Function to Update Slider Label ---
-    function updateLabel(sliderElement, labelElement, labelsArray) {
-        const value = sliderElement.value; // Get the current slider value (as a string)
-        labelElement.textContent = labelsArray[value]; // Update the label's text
+    // --- 3. Description Data (Keep as is) ---
+    const moodDescriptions = ["Severely Depressed", "Very Low Mood", "Low Mood", "Slightly Low", "Neutral Mood", "Okay", "Slightly Elevated", "Elevated Mood", "Very High", "Euphoric/Manic"];
+    const energyDescriptions = ["Completely Exhausted", "Very Low Energy", "Low Energy", "Slightly Tired", "Balanced Energy", "Okay Energy", "Slightly High Energy", "High Energy", "Very High Energy", "Over-energized/Wired"];
+    const anxietyDescriptions = ["Perfectly Calm", "Very Calm", "Calm / Relaxed", "Slightly Anxious", "Moderately Anxious", "Noticeably Anxious", "High Anxiety", "Very High Anxiety", "Severe Anxiety", "Panicked / Overwhelmed"];
+    const restfulnessDescriptions = ["Felt Awake All Night", "Very Poor Sleep", "Poor Sleep Quality", "Slightly Tired Still", "Okay / Neutral", "Fairly Rested", "Rested", "Well Rested", "Very Well Rested", "Perfectly Rested"];
+    const focusDescriptions = ["Complete Brain Fog", "Very Distracted", "Distracted / Foggy", "Slightly Distracted", "Neutral Focus", "Fairly Focused", "Focused", "Very Focused", "Hyperfocused", "Racing Thoughts"];
+
+    // --- 4. Helper Functions (Keep getDescriptionIndex) ---
+    function getDescriptionIndex(value) {
+        if (value >= 100) return 9;
+        return Math.max(0, Math.min(9, Math.floor(value / 10)));
     }
 
-    // --- 4. Attach Event Listeners to Sliders ---
-    // Add listener for 'input' event (fires whenever the value changes)
-    moodSlider.addEventListener('input', () => updateLabel(moodSlider, moodValueLabel, moodLabels));
-    energySlider.addEventListener('input', () => updateLabel(energySlider, energyValueLabel, energyLabels));
-    anxietySlider.addEventListener('input', () => updateLabel(anxietySlider, anxietyValueLabel, anxietyLabels));
-    sleepRestfulnessSlider.addEventListener('input', () => updateLabel(sleepRestfulnessSlider, sleepRestfulnessValueLabel, sleepRestfulnessLabels));
-    focusSlider.addEventListener('input', () => updateLabel(focusSlider, focusValueLabel, focusLabels));
+    // --- 5. Update Display Functions (Keep as is) ---
+    function updateMoodDisplay(value) { moodDescriptionEl.textContent = moodDescriptions[getDescriptionIndex(value)]; moodValueInputEl.value = value; }
+    function updateEnergyDisplay(value) { energyDescriptionEl.textContent = energyDescriptions[getDescriptionIndex(value)]; energyValueInputEl.value = value; }
+    function updateAnxietyDisplay(value) { anxietyDescriptionEl.textContent = anxietyDescriptions[getDescriptionIndex(value)]; anxietyValueInputEl.value = value; }
+    function updateRestfulnessDisplay(value) { restfulnessDescriptionEl.textContent = restfulnessDescriptions[getDescriptionIndex(value)]; restfulnessValueInputEl.value = value; }
+    function updateFocusDisplay(value) { focusDescriptionEl.textContent = focusDescriptions[getDescriptionIndex(value)]; focusValueInputEl.value = value; }
 
-    // --- 5. Initialize Labels on Page Load ---
-    // Call updateLabel once for each slider to set the initial text based on default values
-    updateLabel(moodSlider, moodValueLabel, moodLabels);
-    updateLabel(energySlider, energyValueLabel, energyLabels);
-    updateLabel(anxietySlider, anxietyValueLabel, anxietyLabels);
-    updateLabel(sleepRestfulnessSlider, sleepRestfulnessValueLabel, sleepRestfulnessLabels);
-    updateLabel(focusSlider, focusValueLabel, focusLabels);
+  // --- 6. Slider Initialization (ADJUST ANGLES for Top Semi-circle) ---
+  function initializeSliders() {
+    const sliderOptions = {
+        radius: 110,
+        width: 20,
+        handleSize: "+0",
+        handleShape: "round",
+        circleShape: "pie",      // Keep pie shape for the track
+        sliderType: "min-range", // Keep min-range for fill
+        // CHANGED ANGLES: 9 o'clock to 3 o'clock (top semi-circle)
+        startAngle: -45,    // Start at 9 o'clock
+        endAngle: "+180",   // Sweep 180 degrees counter-clockwise
+        // -----
+        value: 50,         // Default 0-100 value (should be top-center)
+        min: 0,
+        max: 100,
+        step: 1,
+        showTooltip: true, // For center text
+        // svgMode: true // Keep commented out
+    };
 
-    // --- 6. Handle Form Submission ---
+    // Initialize all sliders with these options...
+    // Mood Slider
+    $("#moodSliderContainer").roundSlider({
+        ...sliderOptions,
+        tooltipFormat: function() { return "Mood"; },
+        create: function(args) { updateMoodDisplay(args.value); },
+        valueChange: function(args) { updateMoodDisplay(args.value); },
+        drag: function(args) { updateMoodDisplay(args.value); }
+    });
+
+    // Energy Slider
+    $("#energySliderContainer").roundSlider({
+         ...sliderOptions,
+        tooltipFormat: function() { return "Energy"; },
+        create: function(args) { updateEnergyDisplay(args.value); },
+        valueChange: function(args) { updateEnergyDisplay(args.value); },
+        drag: function(args) { updateEnergyDisplay(args.value); }
+     });
+    // Anxiety Slider
+    $("#anxietySliderContainer").roundSlider({
+        ...sliderOptions,
+        tooltipFormat: function() { return "Anxiety"; },
+        create: function(args) { updateAnxietyDisplay(args.value); },
+        valueChange: function(args) { updateAnxietyDisplay(args.value); },
+        drag: function(args) { updateAnxietyDisplay(args.value); }
+    });
+    // Restfulness Slider
+    $("#restfulnessSliderContainer").roundSlider({
+        ...sliderOptions,
+        tooltipFormat: function() { return "How Rested?"; },
+        create: function(args) { updateRestfulnessDisplay(args.value); },
+        valueChange: function(args) { updateRestfulnessDisplay(args.value); },
+        drag: function(args) { updateRestfulnessDisplay(args.value); }
+    });
+    // Focus Slider
+    $("#focusSliderContainer").roundSlider({
+        ...sliderOptions,
+        tooltipFormat: function() { return "Focus"; },
+        create: function(args) { updateFocusDisplay(args.value); },
+        valueChange: function(args) { updateFocusDisplay(args.value); },
+        drag: function(args) { updateFocusDisplay(args.value); }
+    });
+
+    console.log("Round sliders re-initialized (circleShape: pie, type: min-range, top semi-circle angles).");}
+
+    // --- 7. Pagination Logic (Keep as is) ---
+    function showPage(index) {
+        pages.forEach((page, i) => page.classList.toggle('active', i === index));
+        prevBtn.disabled = (index === 0);
+        nextBtn.style.display = (index === totalPages - 1) ? 'none' : 'inline-block';
+        submitButton.style.display = (index === totalPages - 1) ? 'inline-block' : 'none';
+        currentPageIndex = index;
+        console.log(`Showing page ${currentPageIndex}`);
+    }
+    function navigatePage(direction) {
+        let newIndex = currentPageIndex + direction;
+        if (newIndex >= 0 && newIndex < totalPages) showPage(newIndex);
+    }
+    prevBtn.addEventListener('click', () => navigatePage(-1));
+    nextBtn.addEventListener('click', () => navigatePage(1));
+
+    // --- 8. Form Submission (MODIFIED) ---
     checkinForm.addEventListener('submit', (event) => {
-        event.preventDefault(); // IMPORTANT: Prevent the default form submission (page reload)
+        event.preventDefault();
 
-        // Create an object to hold the check-in data
+        // REMOVED: mapSliderValueToScale function
+
+        // Create the check-in data object - SAVE 0-100 VALUES DIRECTLY
         const checkInData = {
-            timestamp: new Date().toISOString(), // Record the time of submission in standard format
-            mood: parseInt(moodSlider.value), // Convert string value to integer
-            energy: parseInt(energySlider.value),
-            anxiety: parseInt(anxietySlider.value),
-            sleep_hours: parseInt(sleepHoursInput.value) || 0, // Use 0 if input is empty
-            sleep_restfulness: parseInt(sleepRestfulnessSlider.value),
-            focus: parseInt(focusSlider.value),
-            notes: notesTextarea.value.trim() // Get notes, remove extra whitespace
+             // Storing UTC timestamp remains best practice. Display formatting happens later.
+            timestamp: new Date().toISOString(),
+            mood: parseInt(moodValueInputEl.value),         // Save 0-100
+            energy: parseInt(energyValueInputEl.value),       // Save 0-100
+            anxiety: parseInt(anxietyValueInputEl.value),     // Save 0-100
+            sleep_hours: parseFloat(sleepHoursInput.value) || 0, // Still direct value
+            sleep_restfulness: parseInt(restfulnessValueInputEl.value), // Save 0-100
+            focus: parseInt(focusValueInputEl.value),       // Save 0-100
+            notes: notesTextarea.value.trim()
         };
 
- // --- NEW: Save data to localStorage ---
- try {
-    // Define the key we'll use to store our data in localStorage
-    const storageKey = 'wellnessCheckins';
+         // --- Save data to localStorage (Keep existing logic) ---
+        try {
+            const storageKey = 'wellnessCheckins';
+            const existingDataString = localStorage.getItem(storageKey);
+            let checkins = [];
+            if (existingDataString) {
+                checkins = JSON.parse(existingDataString);
+                if (!Array.isArray(checkins)) { checkins = []; }
+            }
+            checkins.push(checkInData);
+            const updatedDataString = JSON.stringify(checkins);
+            localStorage.setItem(storageKey, updatedDataString);
 
-    // 1. Get existing data (if any)
-    const existingDataString = localStorage.getItem(storageKey);
+            console.log("Check-in saved (0-100 scale):", checkInData);
+            alert("Check-in saved! 🎉");
 
-    // 2. Parse existing data or initialize an empty array
-    let checkins = [];
-    if (existingDataString) {
-        checkins = JSON.parse(existingDataString);
-        // Basic validation: ensure it's an array
-        if (!Array.isArray(checkins)) {
-            console.warn("Invalid data found in localStorage, resetting.");
-            checkins = [];
+            // --- Reset form (Keep existing logic) ---
+            moodValueInputEl.value = 50;
+            energyValueInputEl.value = 50;
+            anxietyValueInputEl.value = 50;
+            restfulnessValueInputEl.value = 50;
+            focusValueInputEl.value = 50;
+            sleepHoursInput.value = 8;
+            notesTextarea.value = '';
+
+            $("#moodSliderContainer").roundSlider("option", "value", 50);
+            $("#energySliderContainer").roundSlider("option", "value", 50);
+            $("#anxietySliderContainer").roundSlider("option", "value", 50);
+            $("#restfulnessSliderContainer").roundSlider("option", "value", 50);
+            $("#focusSliderContainer").roundSlider("option", "value", 50);
+
+            showPage(0); // Navigate back to the first page
+
+        } catch (error) {
+            console.error("Error saving check-in data:", error);
+            alert("Sorry, there was an error saving your check-in.");
         }
-    }
+    });
 
-    // 3. Add the new check-in data to the array
-    checkins.push(checkInData);
 
-    // 4. Convert the updated array back to a JSON string
-    const updatedDataString = JSON.stringify(checkins);
+    // --- 9. Initial Setup (Keep as is) ---
+    initializeSliders();
+    showPage(0);
 
-    // 5. Store the updated JSON string in localStorage
-    localStorage.setItem(storageKey, updatedDataString);
+    console.log("Check-in page initialized.");
 
-    // --- Provide User Feedback ---
-    console.log("Check-in saved successfully to localStorage:", checkInData);
-    alert("Check-in saved! 🎉"); // Give positive feedback
-
-    // --- Optional: Reset the form after successful submission ---
-    checkinForm.reset(); // Resets all form fields to their default values
-    // Re-initialize labels after reset
-    updateLabel(moodSlider, moodValueLabel, moodLabels);
-    updateLabel(energySlider, energyValueLabel, energyLabels);
-    updateLabel(anxietySlider, anxietyValueLabel, anxietyLabels);
-    updateLabel(sleepRestfulnessSlider, sleepRestfulnessValueLabel, sleepRestfulnessLabels);
-    updateLabel(focusSlider, focusValueLabel, focusLabels);
-    // Note: The sleep hours input and textarea will also be reset by form.reset()
-
-} catch (error) {
-    // --- Handle Potential Errors (e.g., localStorage full, invalid JSON) ---
-    console.error("Error saving check-in data:", error);
-    alert("Sorry, there was an error saving your check-in. Please try again.");
-}
-
-// --- TODO (Later Steps) ---
-// 1. Build the Dashboard/Visualization screen.
-// 2. Load data from localStorage onto the Dashboard.
-// 3. Implement sending data to your server (if desired).
-});
-
-}); // End of DOMContentLoaded listener
+}); // End of jQuery $(document).ready

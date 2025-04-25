@@ -1,82 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mental Wellness Check-in</title>
-    <!-- Link to the CSS file -->
-    <link rel="stylesheet" href="style.css">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Mental Wellness Check-in</title>
+    
+        <!-- jQuery CDN -->
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    
+        <!-- roundSlider CSS CDN -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/round-slider@1.6.1/dist/roundslider.min.css">
+    
+        <!-- Your Custom CSS -->
+        <link rel="stylesheet" href="style.css">
+    
+        <!-- ADD THIS SVG GRADIENT DEFINITION -->
+        <svg width="0" height="0" style="position:absolute; z-index:-1;">
+            <defs>
+                <linearGradient id="sliderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#3498db;" />   <!-- Blue -->
+                    <stop offset="50%" style="stop-color:#2ecc71;" />  <!-- Green -->
+                    <stop offset="100%" style="stop-color:#e74c3c;" /> <!-- Red -->
+                </linearGradient>
+            </defs>
+        </svg>
+        <!-- END SVG GRADIENT DEFINITION -->
+    
+    
+        <style>
+            /* Additional page-specific styles (Keep as is) */
+            /* ... */
+        </style>
+    </head>
 <body>
 
     <h1>Daily Check-in</h1>
+    <p><a href="dashboard.html">View Dashboard & Mood Map</a></p>
 
-    <!-- Add this inside the <body>, maybe right after the <h1> -->
-<p><a href="dashboard.html">View Dashboard & Mood Map</a></p>
-
-    <!-- The form container for all inputs -->
     <form id="checkinForm">
 
-        <!-- Mood Card -->
-        <div class="metric-card">
-            <label for="moodSlider">How is your mood today?</label>
-            <input type="range" id="moodSlider" name="mood" min="1" max="5" step="1" value="3">
-            <span class="slider-value" id="moodValueLabel">Neutral</span>
-            <!-- We'll add dynamic label text later with JS -->
-        </div>
-
-        <!-- Energy Card -->
-        <div class="metric-card">
-            <label for="energySlider">What’s your energy level?</label>
-            <input type="range" id="energySlider" name="energy" min="1" max="5" step="1" value="3">
-            <span class="slider-value" id="energyValueLabel">Balanced</span>
-            <!-- We'll add dynamic label text later with JS -->
-        </div>
-
-        <!-- Anxiety/Irritability Card -->
-        <div class="metric-card">
-            <label for="anxietySlider">How anxious or irritable do you feel?</label>
-            <input type="range" id="anxietySlider" name="anxiety" min="1" max="5" step="1" value="3">
-            <span class="slider-value" id="anxietyValueLabel">Moderate</span>
-            <!-- We'll add dynamic label text later with JS -->
-        </div>
-
-        <!-- Sleep Card -->
-        <div class="metric-card">
-            <label>How did you sleep?</label>
-            <div>
-                <label for="sleepHoursInput">Hours Slept:</label>
-                <input type="number" id="sleepHoursInput" name="sleep_hours" min="0" max="24" step="1" value="8">
-                <!-- Note: Max 24 is more realistic than 12 -->
+        <!-- Page 1: Mood -->
+        <div class="page active" id="pageMood">
+            <h2>How is your mood today?</h2>
+            <div class="slider-container">
+                <div id="moodSliderContainer">
+                    <!-- REMOVED: <div class="slider-text">Mood</div> -->
+                </div>
             </div>
-            <div>
-                <label for="sleepRestfulnessSlider">Restfulness:</label>
-                <input type="range" id="sleepRestfulnessSlider" name="sleep_restfulness" min="1" max="5" step="1" value="3">
-                <span class="slider-value" id="sleepRestfulnessValueLabel">Okay</span>
-                 <!-- We'll add dynamic label text later with JS -->
+            <div class="description-box" id="moodDescription">Loading description...</div>
+            <input type="hidden" name="moodValue" id="moodValueInput" value="50">
+        </div>
+
+        <!-- Page 2: Energy -->
+        <div class="page" id="pageEnergy">
+            <h2>What’s your energy level?</h2>
+            <div class="slider-container">
+                <div id="energySliderContainer">
+                     <!-- REMOVED: <div class="slider-text">Energy</div> -->
+                </div>
             </div>
+            <div class="description-box" id="energyDescription">Loading description...</div>
+            <input type="hidden" name="energyValue" id="energyValueInput" value="50">
         </div>
 
-        <!-- Focus Card -->
-        <div class="metric-card">
-            <label for="focusSlider">How clear or busy is your mind?</label>
-            <input type="range" id="focusSlider" name="focus" min="1" max="5" step="1" value="3">
-            <span class="slider-value" id="focusValueLabel">Neutral</span>
-             <!-- We'll add dynamic label text later with JS -->
+        <!-- Page 3: Anxiety/Irritability -->
+        <div class="page" id="pageAnxiety">
+             <h2>How anxious or irritable do you feel?</h2>
+            <div class="slider-container">
+                <div id="anxietySliderContainer">
+                     <!-- REMOVED: <div class="slider-text">Anxiety</div> -->
+                </div>
+            </div>
+            <div class="description-box" id="anxietyDescription">Loading description...</div>
+            <input type="hidden" name="anxietyValue" id="anxietyValueInput" value="50">
         </div>
 
-        <!-- Optional Notes Card -->
-        <div class="metric-card">
-            <label for="notesTextarea">Optional Notes:</label>
-            <textarea id="notesTextarea" name="notes" rows="3" placeholder="Any specific thoughts or events?"></textarea>
+        <!-- Page 4: Sleep -->
+        <div class="page" id="pageSleep">
+            <h2>How did you sleep?</h2>
+            <div class="sleep-hours-input-container">
+                 <label for="sleepHoursInput">Hours Slept (approx):</label>
+                 <input type="number" id="sleepHoursInput" name="sleep_hours" min="0" max="24" step="0.5" value="8">
+            </div>
+            <p style="text-align: center; margin-top: 25px; margin-bottom: 10px; font-weight: bold;">How restful was your sleep?</p>
+            <div class="slider-container">
+                <div id="restfulnessSliderContainer">
+                     <!-- REMOVED: <div class="slider-text">Restful</div> -->
+                </div>
+            </div>
+            <div class="description-box" id="restfulnessDescription">Loading description...</div>
+            <input type="hidden" name="restfulnessValue" id="restfulnessValueInput" value="50">
         </div>
 
-        <!-- Submit Button -->
-        <button type="submit" id="submitButton">Done! ✅</button>
+        <!-- Page 5: Focus -->
+        <div class="page" id="pageFocus">
+            <h2>How clear or busy is your mind?</h2>
+            <div class="slider-container">
+                <div id="focusSliderContainer">
+                     <!-- REMOVED: <div class="slider-text">Focus</div> -->
+                </div>
+            </div>
+            <div class="description-box" id="focusDescription">Loading description...</div>
+            <input type="hidden" name="focusValue" id="focusValueInput" value="50">
+        </div>
+
+         <!-- Page 6: Notes -->
+         <div class="page" id="pageNotes">
+             <h2>Any additional notes?</h2>
+             <div class="notes-container">
+                 <label for="notesTextarea">Optional Notes:</label>
+                 <textarea id="notesTextarea" name="notes" rows="4" placeholder="Any specific thoughts, events, medication changes, etc.?"></textarea>
+             </div>
+         </div>
+
+        <!-- Navigation Buttons (Keep as is) -->
+        <div class="nav-buttons">
+            <button type="button" id="prevBtn" disabled>Previous</button>
+            <button type="button" id="nextBtn">Next</button>
+            <button type="submit" id="submitButton" style="display: none;">Done! ✅</button>
+        </div>
 
     </form>
 
-    <!-- Link to the JavaScript file - MUST be at the end of body -->
+    <!-- roundSlider JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/round-slider@1.6.1/dist/roundslider.min.js"></script>
+
+    <!-- Your Custom JavaScript -->
     <script src="script.js"></script>
+
 </body>
 </html>
