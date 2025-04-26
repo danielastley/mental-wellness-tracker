@@ -1,191 +1,325 @@
-/* Basic body and overall form styling (Keep as is) */
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; line-height: 1.6; background-color: #f4f7f6; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-h1 { color: #333; text-align: center; margin-bottom: 10px; }
-h2 { text-align: center; color: #555; margin-bottom: 25px; font-weight: 500; }
-a { color: #007bff; text-decoration: none; }
-a:hover { text-decoration: underline; }
-p { text-align: center; margin-bottom: 20px; }
-#checkinForm { background-color: #ffffff; padding: 30px 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); max-width: 550px; width: 100%; box-sizing: border-box; overflow: hidden; }
+/* --- Base and Typography --- */
+body {
+    font-family: 'Nunito Sans', sans-serif;
+    line-height: 1.6;
+    background-color: #FFF9D3; /* Pale Yellow Background */
+    color: #444444; /* Dark Grey text */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 16px; /* Base font size */
+}
 
-/* --- Pagination Styles (Keep as is) --- */
+h1 {
+    color: #685E96; /* Darker Purple Heading */
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: 700;
+    font-size: 2em; /* Relative to body */
+}
+
+h2 {
+    text-align: center;
+    color: #8A82AE; /* Mid Purple Sub-heading */
+    margin-bottom: 20px; /* Reduced margin */
+    font-weight: 700;
+    font-size: 1.4em;
+}
+
+a {
+    color: #8A82AE; /* Mid Purple Link */
+    text-decoration: none;
+    font-weight: 700;
+}
+a:hover {
+    text-decoration: underline;
+    color: #685E96; /* Darker Purple Hover */
+}
+
+p {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* --- Form Container --- */
+#checkinForm {
+    background-color: #ffffff; /* White container */
+    padding: 40px 50px;
+    border-radius: 16px; /* Softer radius */
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.07); /* Softer shadow */
+    max-width: 550px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* --- Pagination Styles --- */
 .page { display: none; animation: fadeIn 0.5s ease-in-out; }
 .page.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* --- Slider Styles (Keep base container as is) --- */
-.slider-container { display: flex; justify-content: center; align-items: center; min-height: 250px; position: relative; margin-bottom: 20px; }
-#moodSliderContainer, #energySliderContainer, #anxietySliderContainer, #restfulnessSliderContainer, #focusSliderContainer { width: 80%; max-width: 260px; aspect-ratio: 1 / 1; margin: auto; }
+/* --- Slider Styles --- */
+.slider-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: auto; /* Let content define height */
+    position: relative; /* Crucial for text overlay */
+    margin-bottom: 15px; /* Reduced spacing */
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+/* Div where roundSlider is initialized */
+#moodSliderInstance,
+#energySliderInstance,
+#anxietySliderInstance,
+#restfulnessSliderInstance,
+#focusSliderInstance {
+    width: 85%;
+    max-width: 280px;
+    aspect-ratio: 1 / 1;
+    margin: auto;
+    overflow: hidden; /* Prevent overlay overlap */
+    /* position: relative; -- Not needed here, parent has it */
+}
 
 /* roundSlider specific styling */
-.rs-path-color { background-color: #e9ecef; }
-.rs-handle { background-color: #ffffff; border: 4px solid #6c757d; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.rs-path-color {
+    /* background-color: #EDEDED; */ /* REMOVE THIS LINE */
+    /* ADD THIS LINE: Apply a subtle Lavender-to-Mint gradient */
+    background-color: #E4E0F1; 
+    /* Using 135deg for a diagonal gradient, often looks nice on curves */
+}
+.rs-handle {
+    background-color: #ffffff; /* Base background (changed by JS) */
+    border: 4px solid #8A82AE; /* Mid Purple Border */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
 .rs-handle::after { display: none; }
 
-
-/* --- UPDATED GRADIENT APPLICATION --- */
-/* Target the SVG path element specifically when in svgMode */
-/* This might be needed for gradients to work reliably in SVG mode */
-.rs-range path, /* Target SVG path for range */
-.rs-range-color  /* Keep targeting DIV for non-SVG fallback */
+/* REMOVED GRADIENT RULES FOR PATH/RANGE */
+.rs-range path,
+.rs-range-color
 {
-    /* Use fill for SVG path gradient */
-    fill: url(#sliderGradient); /* Reference the SVG gradient definition */
-
-    /* Fallback for non-SVG mode (might not be needed but safe to keep) */
-    background: linear-gradient(135deg, #3498db 0%, #2ecc71 50%, #e74c3c 100%);
+    background: none;
+    fill: none;
 }
 
-/* --- Define the SVG Gradient --- */
-/* Add this SVG definition somewhere in your CSS or directly in HTML <head> */
-/* (Placing in CSS might not work in all browsers, HTML head is safer) */
-/* We will add this directly to index.html <head> instead */
-
-
-/* Style the Tooltip to act as Centered Text (Keep as is) */
-.rs-tooltip .rs-tooltip-text {
-    font-size: 1.8em !important; font-weight: bold !important; color: #495057 !important;
-    background-color: transparent !important; border: none !important; box-shadow: none !important;
-    padding: 0 !important; white-space: nowrap; position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%); pointer-events: none; user-select: none;
-}
-
-/* Potential fix for rendering issues - apply to slider container */
-#moodSliderContainer, #energySliderContainer, #anxietySliderContainer, #restfulnessSliderContainer, #focusSliderContainer {
-    /* Existing styles: width, max-width, aspect-ratio, margin */
-    width: 80%; max-width: 260px; aspect-ratio: 1 / 1; margin: auto;
-    /* ADD THIS: */
-    transform-style: preserve-3d; /* Can sometimes help browser rendering */
-    backface-visibility: hidden; /* Another rendering hint */
-}
-
-/* --- Style the Tooltip to act as Centered Text --- */
-/* Target the tooltip generated by roundSlider */
-.rs-tooltip .rs-tooltip-text {
-    font-size: 1.8em !important; /* Make text large */
-    font-weight: bold !important;
-    color: #495057 !important; /* Match previous style */
-    background-color: transparent !important; /* Remove default tooltip background */
-    border: none !important; /* Remove default border */
-    box-shadow: none !important; /* Remove default shadow */
-    padding: 0 !important; /* Remove default padding */
-    white-space: nowrap; /* Prevent wrapping */
-    /* Center it - roundSlider usually does a good job, but fine-tune if needed */
-     position: absolute;
-     top: 50%;
-     left: 50%;
-     transform: translate(-50%, -50%);
-     pointer-events: none; /* Prevent interaction */
-     user-select: none; /* Prevent selection */
-}
-
-/* --- Description Box (Keep as is) --- */
-.description-box { min-height: 60px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 15px; text-align: center; margin-top: 15px; margin-bottom: 30px; font-size: 1.1em; color: #495057; display: flex; justify-content: center; align-items: center; }
-
-/* --- Navigation Buttons (Keep as is) --- */
-.nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
-.nav-buttons button { padding: 12px 25px; font-size: 1em; border: none; border-radius: 25px; cursor: pointer; transition: background-color 0.2s ease, box-shadow 0.2s ease; font-weight: 500; }
-#prevBtn { background-color: #6c757d; color: white; }
-#prevBtn:disabled { background-color: #ced4da; cursor: not-allowed; opacity: 0.7; }
-#prevBtn:not(:disabled):hover { background-color: #5a6268; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
-#nextBtn, #submitButton { background-color: #007bff; color: white; }
-#nextBtn:hover, #submitButton:hover { background-color: #0056b3; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
-
-/* --- Sleep Hours Input styling (Keep as is) --- */
-.sleep-hours-input-container { margin-top: 20px; text-align: center; }
-.sleep-hours-input-container label { margin-right: 10px; }
-#sleepHoursInput { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 70px; }
-
-/* --- Notes container styling (Keep as is) --- */
-.notes-container { margin-top: 20px; padding: 15px; border-top: 1px solid #eee; }
-.notes-container label { display: block; margin-bottom: 5px; font-weight: bold; }
-.notes-container textarea { width: 100%; min-height: 60px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-
-/* --- Timeline Styles --- */
-#timelineContainer {
-    width: 90%;
-    max-width: 700px; /* Can be wider than chart */
-    margin: 30px auto;
-    padding: 15px;
-    background-color: #f8f9fa; /* Light background for timeline area */
-    border-radius: 8px;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
-    text-align: center; /* Center the heading */
-}
-
-#timelineContainer h2 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #555;
-    font-size: 1.2em;
-}
-
-#timelineDots {
-    display: flex; /* Arrange dots in a row */
-    flex-wrap: wrap; /* Allow wrapping if too many dots */
-    justify-content: center; /* Center dots horizontally */
-    gap: 10px; /* Spacing between dots */
-    padding: 10px 0;
-}
-
-/* --- Individual Dot Styling (CRITICAL) --- */
-.timeline-dot {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%; /* Make it circular */
-    border: 2px solid #ccc; /* Default border */
-    cursor: pointer;
-    transition: transform 0.2s ease, border-color 0.2s ease;
-    background-color: #e0e0e0; /* Default background */
-    display: block; /* Use block instead of flex if no content inside */
-    /* display: flex; align-items: center; justify-content: center; */ /* Use if text needed INSIDE dot */
-    font-size: 0; /* Hide any accidental text node inside */
-    position: relative; /* Needed for tooltip positioning */
-}
-
-/* Style for the currently selected dot */
-.timeline-dot.selected {
-    border-color: #007bff; /* Highlight border */
-    transform: scale(1.2); /* Make it slightly larger */
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
-
-.timeline-dot:hover {
-    transform: scale(1.1); /* Slightly enlarge on hover */
-}
-
-/* --- Tooltip for dot (Should be hidden by default) --- */
-/* This styles the SPAN with class 'tooltip-text' INSIDE the .timeline-dot */
-.timeline-dot .tooltip-text {
-    visibility: hidden;
-    width: 100px;
-    background-color: #555;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 0;
+/* Style the separate text overlay div */
+.slider-text-overlay {
     position: absolute;
-    z-index: 1;
-    bottom: 125%; /* Position above the dot */
+    top: 50%;
     left: 50%;
-    margin-left: -50px; /* Center the tooltip */
-    opacity: 0;
-    transition: opacity 0.3s;
-    font-size: 0.8em;
+    transform: translate(-50%, -50%);
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 2.4em;
+    font-weight: 700;
+    color: #685E96;
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    line-height: 1;
+    z-index: 10;
+    text-align: center; /* Center single line text too */
 }
 
-.timeline-dot:hover .tooltip-text { /* Show tooltip on dot hover */
-    visibility: visible;
-    opacity: 1;
+/* Specific styles for the 'How Rested?' text overlay */
+#restfulnessTextOverlay {
+    white-space: normal; /* Allow wrap */
+    max-width: 130px; /* Adjusted width for better centering */
+    line-height: 1.1; /* Spacing for wrapped lines */
+    /* Inherits most styles from .slider-text-overlay */
+    /* transform: translate(-50%, -50%); -- Already inherited */
 }
 
-/* --- Example Mood Color Coding (Based on data-mood attribute) --- */
-/* These rules target the .timeline-dot SPAN itself */
-.timeline-dot[data-mood='1'] { background-color: #dc3545; border-color: #b02a37; } /* Red */
-.timeline-dot[data-mood='2'] { background-color: #fd7e14; border-color: #c66310; } /* Orange */
-.timeline-dot[data-mood='3'] { background-color: #ffc107; border-color: #c79606; } /* Yellow */
-.timeline-dot[data-mood='4'] { background-color: #28a745; border-color: #208538; } /* Green */
-.timeline-dot[data-mood='5'] { background-color: #0d6efd; border-color: #0a58ca; } /* Blue */
 
-/* --- Keep any Sleep Hours Input / Notes container styles below if separate --- */
-/* e.g., .sleep-hours-input-container { ... } */
-/* e.g., .notes-container { ... } */
+/* --- Description Box --- */
+.description-box {
+    min-height: 50px; /* Reduced height */
+    background-color: #f8f9fa;
+    border: 1px solid #EAEAEA;
+    border-radius: 8px;
+    padding: 10px 15px; /* Reduced padding */
+    text-align: center;
+    margin-top: 15px; /* Reduced margin */
+    margin-bottom: 25px; /* Reduced margin */
+    font-size: 1.15em;
+    color: #555555;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1.5;
+}
+
+/* --- Navigation Buttons --- */
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px; /* Reduced margin */
+    padding-top: 15px; /* Reduced padding */
+    border-top: 1px solid #f0f0f0;
+}
+
+.nav-buttons button {
+    font-family: 'Nunito Sans', sans-serif;
+    padding: 12px 30px;
+    font-size: 1.05em;
+    border: none;
+    border-radius: 8px; /* Elegant radius */
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    font-weight: 700;
+}
+.nav-buttons button:active {
+    transform: scale(0.98);
+}
+
+#prevBtn {
+    background-color: #AAAAAA; /* Mid Grey */
+    color: #ffffff;
+}
+#prevBtn:disabled {
+    background-color: #D0D0D0; /* Light Grey */
+    color: #888888;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+#prevBtn:not(:disabled):hover {
+    background-color: #888888; /* Darker Grey */
+}
+
+#nextBtn, #submitButton {
+    background-color: #8A82AE; /* Mid Purple */
+    color: white;
+}
+#nextBtn:hover, #submitButton:hover {
+    background-color: #685E96; /* Darker Purple */
+}
+
+/* --- Input specific styling --- */
+#sleepHoursInput {
+    font-family: 'Nunito Sans', sans-serif;
+    border-color: #D0D0D0;
+    text-align: center;
+}
+.notes-container textarea {
+    font-family: 'Nunito Sans', sans-serif;
+    border-color: #D0D0D0;
+}
+
+
+/* --- Media Query for Smaller Screens --- */
+@media (max-width: 600px) {
+
+    body {
+        padding: 15px;
+        font-size: 15px; /* Slightly smaller base on mobile */
+    }
+
+    #checkinForm {
+        padding: 25px 20px;
+        border-radius: 12px;
+    }
+
+    h1 { font-size: 1.8em; }
+    h2 { font-size: 1.2em; margin-bottom: 15px; }
+
+    .slider-container {
+        margin-bottom: 10px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    #moodSliderInstance,
+    #energySliderInstance,
+    #anxietySliderInstance,
+    #restfulnessSliderInstance,
+    #focusSliderInstance {
+        width: 90%;
+        max-width: 240px; /* Smaller max size */
+    }
+
+    .slider-text-overlay {
+         font-size: 2.0em; /* Smaller center text on mobile */
+    }
+    #restfulnessTextOverlay {
+        max-width: 110px; /* Adjust wrap width for smaller font */
+        /* font-size might not need separate override now */
+    }
+
+    .description-box {
+        font-size: 1.0em; /* Smaller description */
+        min-height: 40px;
+        padding: 8px 10px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+
+    .nav-buttons {
+        margin-top: 10px;
+        padding-top: 10px;
+    }
+
+    .nav-buttons button {
+        padding: 10px 20px;
+        font-size: 0.95em;
+    }
+
+    .sleep-hours-input-container { margin-top: 15px; }
+    #sleepHoursInput { padding: 6px; width: 60px; }
+    .notes-container { margin-top: 15px; padding: 10px; }
+
+    /* --- Specific adjustments for Sleep Page on Mobile --- */
+
+    #pageSleep h2 {
+        margin-bottom: 10px; /* Further reduce margin below heading */
+        font-size: 1.15em; /* Slightly smaller heading for this page */
+    }
+
+    #pageSleep .sleep-hours-input-container {
+        margin-top: 10px; /* Reduce space above hours input */
+        margin-bottom: 15px; /* Add some space below hours input */
+    }
+    #pageSleep .sleep-hours-input-container label {
+        font-size: 0.9em; /* Slightly smaller label */
+    }
+     #pageSleep #sleepHoursInput {
+         padding: 5px; /* Slightly smaller input */
+     }
+
+
+    /* Target the paragraph label specifically */
+    #pageSleep p {
+         margin-top: 15px; /* Reduce space above paragraph */
+         margin-bottom: 5px; /* Reduce space below paragraph */
+         font-size: 0.9em; /* Make label smaller */
+         font-weight: normal; /* Maybe less bold if needed */
+    }
+
+    /* Reduce space around the restfulness slider container */
+    #pageSleep .slider-container {
+        margin-bottom: 5px; /* Tighter below slider */
+        padding-top: 0; /* Remove padding if not needed */
+        padding-bottom: 0;
+    }
+     /* Optionally make slider slightly smaller JUST on this page */
+     /*
+     #pageSleep #restfulnessSliderInstance {
+          max-width: 220px;
+     }
+     #pageSleep #restfulnessTextOverlay {
+         font-size: 1.8em !important;
+         max-width: 100px;
+     }
+     */
+
+
+    /* Reduce space around description box */
+    #pageSleep .description-box {
+        margin-top: 10px; /* Tighter above description */
+        margin-bottom: 15px; /* Tighter below description */
+        min-height: 35px; /* Smaller min-height */
+        font-size: 0.95em; /* Smaller text */
+    }
+} /* End of @media query */

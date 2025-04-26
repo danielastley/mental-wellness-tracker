@@ -1,51 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Mental Wellness Check-in</title>
-    
-        <!-- jQuery CDN -->
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    
-        <!-- roundSlider CSS CDN -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/round-slider@1.6.1/dist/roundslider.min.css">
-    
-        <!-- Your Custom CSS -->
-        <link rel="stylesheet" href="style.css">
-    
-        <!-- ADD THIS SVG GRADIENT DEFINITION -->
-        <svg width="0" height="0" style="position:absolute; z-index:-1;">
-            <defs>
-                <linearGradient id="sliderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#3498db;" />   <!-- Blue -->
-                    <stop offset="50%" style="stop-color:#2ecc71;" />  <!-- Green -->
-                    <stop offset="100%" style="stop-color:#e74c3c;" /> <!-- Red -->
-                </linearGradient>
-            </defs>
-        </svg>
-        <!-- END SVG GRADIENT DEFINITION -->
-    
-    
-        <style>
-            /* Additional page-specific styles (Keep as is) */
-            /* ... */
-        </style>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Wellness Check-in</title>
+
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+    <!-- roundSlider CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/round-slider@1.6.1/dist/roundslider.min.css">
+
+    <!-- Google Font: Nunito Sans (Regular 400, Bold 700) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,700;1,6..12,400&display=swap" rel="stylesheet">
+    <!-- End Google Font -->
+
+    <!-- Your Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- REMOVED SVG GRADIENT DEFINITION (No longer needed for handle color) -->
+
+    <style>
+        /* Additional page-specific styles */
+        .sleep-hours-input-container { margin-top: 20px; text-align: center; }
+        .sleep-hours-input-container label { margin-right: 10px; }
+        #sleepHoursInput { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 70px; font-family: 'Nunito Sans', sans-serif; border-color: #D0D0D0; text-align: center; }
+        .notes-container { margin-top: 20px; padding: 15px; border-top: 1px solid #eee; }
+        .notes-container label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .notes-container textarea { width: 100%; min-height: 60px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: 'Nunito Sans', sans-serif; border-color: #D0D0D0; }
+    </style>
+</head>
 <body>
 
-    <h1>Daily Check-in</h1>
-    <p><a href="dashboard.html">View Dashboard & Mood Map</a></p>
 
+<!-- <h1>Daily Check-in</h1> -->
+<p><a href="dashboard.html">View Dashboard & Mood Map</a></p>
+        
+
+    <!-- The form container -->
     <form id="checkinForm">
-
+        
         <!-- Page 1: Mood -->
         <div class="page active" id="pageMood">
             <h2>How is your mood today?</h2>
             <div class="slider-container">
-                <div id="moodSliderContainer">
-                    <!-- REMOVED: <div class="slider-text">Mood</div> -->
-                </div>
+                <div id="moodSliderInstance"></div>
+                <div class="slider-text-overlay">Mood</div>
             </div>
             <div class="description-box" id="moodDescription">Loading description...</div>
             <input type="hidden" name="moodValue" id="moodValueInput" value="50">
@@ -55,9 +57,8 @@
         <div class="page" id="pageEnergy">
             <h2>What’s your energy level?</h2>
             <div class="slider-container">
-                <div id="energySliderContainer">
-                     <!-- REMOVED: <div class="slider-text">Energy</div> -->
-                </div>
+                 <div id="energySliderInstance"></div>
+                 <div class="slider-text-overlay">Energy</div>
             </div>
             <div class="description-box" id="energyDescription">Loading description...</div>
             <input type="hidden" name="energyValue" id="energyValueInput" value="50">
@@ -67,9 +68,8 @@
         <div class="page" id="pageAnxiety">
              <h2>How anxious or irritable do you feel?</h2>
             <div class="slider-container">
-                <div id="anxietySliderContainer">
-                     <!-- REMOVED: <div class="slider-text">Anxiety</div> -->
-                </div>
+                 <div id="anxietySliderInstance"></div>
+                 <div class="slider-text-overlay">Anxiety</div>
             </div>
             <div class="description-box" id="anxietyDescription">Loading description...</div>
             <input type="hidden" name="anxietyValue" id="anxietyValueInput" value="50">
@@ -84,9 +84,8 @@
             </div>
             <p style="text-align: center; margin-top: 25px; margin-bottom: 10px; font-weight: bold;">How restful was your sleep?</p>
             <div class="slider-container">
-                <div id="restfulnessSliderContainer">
-                     <!-- REMOVED: <div class="slider-text">Restful</div> -->
-                </div>
+                <div id="restfulnessSliderInstance"></div>
+                <div class="slider-text-overlay" id="restfulnessTextOverlay">How Rested?</div>
             </div>
             <div class="description-box" id="restfulnessDescription">Loading description...</div>
             <input type="hidden" name="restfulnessValue" id="restfulnessValueInput" value="50">
@@ -96,9 +95,8 @@
         <div class="page" id="pageFocus">
             <h2>How clear or busy is your mind?</h2>
             <div class="slider-container">
-                <div id="focusSliderContainer">
-                     <!-- REMOVED: <div class="slider-text">Focus</div> -->
-                </div>
+                <div id="focusSliderInstance"></div>
+                <div class="slider-text-overlay">Focus</div>
             </div>
             <div class="description-box" id="focusDescription">Loading description...</div>
             <input type="hidden" name="focusValue" id="focusValueInput" value="50">
@@ -113,7 +111,7 @@
              </div>
          </div>
 
-        <!-- Navigation Buttons (Keep as is) -->
+        <!-- Navigation Buttons -->
         <div class="nav-buttons">
             <button type="button" id="prevBtn" disabled>Previous</button>
             <button type="button" id="nextBtn">Next</button>
@@ -122,7 +120,7 @@
 
     </form>
 
-    <!-- roundSlider JS CDN -->
+    <!-- roundSlider JS CDN (Load AFTER jQuery) -->
     <script src="https://cdn.jsdelivr.net/npm/round-slider@1.6.1/dist/roundslider.min.js"></script>
 
     <!-- Your Custom JavaScript -->

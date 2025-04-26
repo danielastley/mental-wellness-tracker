@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-    // --- 1. Select DOM Elements (Keep as is) ---
+    // --- 1. Select DOM Elements ---
     const checkinForm = document.getElementById('checkinForm');
     const pages = document.querySelectorAll('.page');
     const prevBtn = document.getElementById('prevBtn');
@@ -19,104 +19,166 @@ $(document).ready(function() {
     const sleepHoursInput = document.getElementById('sleepHoursInput');
     const notesTextarea = document.getElementById('notesTextarea');
 
-    // --- 2. Pagination State (Keep as is) ---
+    // --- 2. Pagination State ---
     let currentPageIndex = 0;
     const totalPages = pages.length;
 
-    // --- 3. Description Data (Keep as is) ---
+    // --- 3. Description Data ---
     const moodDescriptions = ["Severely Depressed", "Very Low Mood", "Low Mood", "Slightly Low", "Neutral Mood", "Okay", "Slightly Elevated", "Elevated Mood", "Very High", "Euphoric/Manic"];
     const energyDescriptions = ["Completely Exhausted", "Very Low Energy", "Low Energy", "Slightly Tired", "Balanced Energy", "Okay Energy", "Slightly High Energy", "High Energy", "Very High Energy", "Over-energized/Wired"];
     const anxietyDescriptions = ["Perfectly Calm", "Very Calm", "Calm / Relaxed", "Slightly Anxious", "Moderately Anxious", "Noticeably Anxious", "High Anxiety", "Very High Anxiety", "Severe Anxiety", "Panicked / Overwhelmed"];
     const restfulnessDescriptions = ["Felt Awake All Night", "Very Poor Sleep", "Poor Sleep Quality", "Slightly Tired Still", "Okay / Neutral", "Fairly Rested", "Rested", "Well Rested", "Very Well Rested", "Perfectly Rested"];
     const focusDescriptions = ["Complete Brain Fog", "Very Distracted", "Distracted / Foggy", "Slightly Distracted", "Neutral Focus", "Fairly Focused", "Focused", "Very Focused", "Hyperfocused", "Racing Thoughts"];
 
-    // --- 4. Helper Functions (Keep getDescriptionIndex) ---
+    // --- 4. Helper Functions ---
     function getDescriptionIndex(value) {
         if (value >= 100) return 9;
         return Math.max(0, Math.min(9, Math.floor(value / 10)));
     }
 
-    // --- 5. Update Display Functions (Keep as is) ---
+    // Helper Function to Calculate Rainbow Color
+    function getColorForValue(value) {
+        const percent = Math.max(0, Math.min(100, value)) / 100; // Normalize value to 0-1
+        const colors = [ // Blue -> Cyan -> Green -> Yellow -> Orange -> Red
+            { offset: 0,   color: { r: 0,   g: 0,   b: 255 } },
+            { offset: 0.2, color: { r: 0,   g: 255, b: 255 } },
+            { offset: 0.4, color: { r: 0,   g: 255, b: 0   } },
+            { offset: 0.6, color: { r: 255, g: 255, b: 0   } },
+            { offset: 0.8, color: { r: 255, g: 165, b: 0   } },
+            { offset: 1.0, color: { r: 255, g: 0,   b: 0   } }
+        ];
+        let c1, c2;
+        for (let i = 0; i < colors.length - 1; i++) {
+            if (percent >= colors[i].offset && percent <= colors[i+1].offset) {
+                c1 = colors[i];
+                c2 = colors[i+1];
+                break;
+            }
+        }
+        // Ensure c1 and c2 are assigned, defaulting to the first segment if percent is 0
+        if (!c1 && percent === 0) {
+             c1 = colors[0];
+             c2 = colors[1];
+        }
+        // Fallback if something still goes wrong
+        if (!c1 || !c2) {
+            console.warn("Color interpolation failed for value:", value);
+            return 'rgb(128, 128, 128)';
+         }
+
+        // Calculate interpolation factor carefully avoiding division by zero if offsets are same
+        let factor = 0;
+        if (c2.offset > c1.offset) {
+             factor = (percent - c1.offset) / (c2.offset - c1.offset);
+        } else if (percent === c1.offset) {
+            factor = 0; // Exactly at the start color
+        } else {
+             factor = 1; // Assume end color if offsets are the same but percent matches
+        }
+
+
+        const r = Math.round(c1.color.r + factor * (c2.color.r - c1.color.r));
+        const g = Math.round(c1.color.g + factor * (c2.color.g - c1.color.g));
+        const b = Math.round(c1.color.b + factor * (c2.color.b - c1.color.b));
+
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    // Renamed Helper function to update handle AND range color
+    function updateSliderColors(sliderInstance, value) {
+        const color = getColorForValue(value);
+        const sliderControl = $(sliderInstance.control); // Cache jQuery object
+
+        // Update Handle Background
+        const handle = sliderControl.find(".rs-handle");
+        if (handle.length > 0) {
+            handle.css("background-color", color);
+        }
+
+        // Update Range Color (Handles both non-SVG and potential SVG path)
+        const rangeElement = sliderControl.find(".rs-range-color"); // Standard div range
+        const rangePath = sliderControl.find(".rs-range path");     // SVG path range
+
+        if (rangeElement.length > 0) {
+            rangeElement.css("background-color", color); // Use background for div
+             // console.log('Set rangeElement background:', color); // Debug log
+        }
+        if (rangePath.length > 0) {
+             rangePath.css("fill", color); // Use fill for SVG path
+             // console.log('Set rangePath fill:', color); // Debug log
+        }
+
+        // Log if neither range element was found (for debugging)
+        if (rangeElement.length === 0 && rangePath.length === 0) {
+             console.warn("Could not find range element (.rs-range-color or .rs-range path) for slider:", sliderControl);
+        }
+    }
+
+    // --- 5. Update Display Functions (Update text description based on value) ---
     function updateMoodDisplay(value) { moodDescriptionEl.textContent = moodDescriptions[getDescriptionIndex(value)]; moodValueInputEl.value = value; }
     function updateEnergyDisplay(value) { energyDescriptionEl.textContent = energyDescriptions[getDescriptionIndex(value)]; energyValueInputEl.value = value; }
     function updateAnxietyDisplay(value) { anxietyDescriptionEl.textContent = anxietyDescriptions[getDescriptionIndex(value)]; anxietyValueInputEl.value = value; }
     function updateRestfulnessDisplay(value) { restfulnessDescriptionEl.textContent = restfulnessDescriptions[getDescriptionIndex(value)]; restfulnessValueInputEl.value = value; }
     function updateFocusDisplay(value) { focusDescriptionEl.textContent = focusDescriptions[getDescriptionIndex(value)]; focusValueInputEl.value = value; }
 
-  // --- 6. Slider Initialization (ADJUST ANGLES for Top Semi-circle) ---
-  function initializeSliders() {
-    const sliderOptions = {
-        radius: 110,
-        width: 20,
-        handleSize: "+0",
-        handleShape: "round",
-        circleShape: "pie",      // Keep pie shape for the track
-        sliderType: "min-range", // Keep min-range for fill
-        // CHANGED ANGLES: 9 o'clock to 3 o'clock (top semi-circle)
-        startAngle: -45,    // Start at 9 o'clock
-        endAngle: "+180",   // Sweep 180 degrees counter-clockwise
-        // -----
-        value: 50,         // Default 0-100 value (should be top-center)
-        min: 0,
-        max: 100,
-        step: 1,
-        showTooltip: true, // For center text
-        // svgMode: true // Keep commented out
-    };
+    // --- 6. Slider Initialization (Calls updateSliderColors) ---
+    function initializeSliders() {
+        const sliderOptions = {
+            radius: 110, width: 20, handleSize: "+0", handleShape: "round",
+            circleShape: "pie", sliderType: "min-range",
+            startAngle: -45, angle: 270, // Keep working angles
+            value: 50, min: 0, max: 100, step: 1,
+            showTooltip: false, // Using separate div for text
+            // svgMode: true // Keep OFF unless specifically needed and tested
+        };
 
-    // Initialize all sliders with these options...
-    // Mood Slider
-    $("#moodSliderContainer").roundSlider({
-        ...sliderOptions,
-        tooltipFormat: function() { return "Mood"; },
-        create: function(args) { updateMoodDisplay(args.value); },
-        valueChange: function(args) { updateMoodDisplay(args.value); },
-        drag: function(args) { updateMoodDisplay(args.value); }
-    });
+        // Mood Slider
+        $("#moodSliderInstance").roundSlider({
+            ...sliderOptions,
+            create: function(args) { updateMoodDisplay(args.value); updateSliderColors(this, args.value); },
+            valueChange: function(args) { updateMoodDisplay(args.value); updateSliderColors(this, args.value); },
+            drag: function(args) { updateMoodDisplay(args.value); updateSliderColors(this, args.value); }
+        });
+        // Energy Slider
+        $("#energySliderInstance").roundSlider({
+            ...sliderOptions,
+             create: function(args) { updateEnergyDisplay(args.value); updateSliderColors(this, args.value); },
+             valueChange: function(args) { updateEnergyDisplay(args.value); updateSliderColors(this, args.value); },
+             drag: function(args) { updateEnergyDisplay(args.value); updateSliderColors(this, args.value); }
+         });
+        // Anxiety Slider
+        $("#anxietySliderInstance").roundSlider({
+             ...sliderOptions,
+             create: function(args) { updateAnxietyDisplay(args.value); updateSliderColors(this, args.value); },
+             valueChange: function(args) { updateAnxietyDisplay(args.value); updateSliderColors(this, args.value); },
+             drag: function(args) { updateAnxietyDisplay(args.value); updateSliderColors(this, args.value); }
+        });
+        // Restfulness Slider
+        $("#restfulnessSliderInstance").roundSlider({
+             ...sliderOptions,
+             create: function(args) { updateRestfulnessDisplay(args.value); updateSliderColors(this, args.value); },
+             valueChange: function(args) { updateRestfulnessDisplay(args.value); updateSliderColors(this, args.value); },
+             drag: function(args) { updateRestfulnessDisplay(args.value); updateSliderColors(this, args.value); }
+        });
+        // Focus Slider
+        $("#focusSliderInstance").roundSlider({
+             ...sliderOptions,
+             create: function(args) { updateFocusDisplay(args.value); updateSliderColors(this, args.value); },
+             valueChange: function(args) { updateFocusDisplay(args.value); updateSliderColors(this, args.value); },
+             drag: function(args) { updateFocusDisplay(args.value); updateSliderColors(this, args.value); }
+        });
 
-    // Energy Slider
-    $("#energySliderContainer").roundSlider({
-         ...sliderOptions,
-        tooltipFormat: function() { return "Energy"; },
-        create: function(args) { updateEnergyDisplay(args.value); },
-        valueChange: function(args) { updateEnergyDisplay(args.value); },
-        drag: function(args) { updateEnergyDisplay(args.value); }
-     });
-    // Anxiety Slider
-    $("#anxietySliderContainer").roundSlider({
-        ...sliderOptions,
-        tooltipFormat: function() { return "Anxiety"; },
-        create: function(args) { updateAnxietyDisplay(args.value); },
-        valueChange: function(args) { updateAnxietyDisplay(args.value); },
-        drag: function(args) { updateAnxietyDisplay(args.value); }
-    });
-    // Restfulness Slider
-    $("#restfulnessSliderContainer").roundSlider({
-        ...sliderOptions,
-        tooltipFormat: function() { return "How Rested?"; },
-        create: function(args) { updateRestfulnessDisplay(args.value); },
-        valueChange: function(args) { updateRestfulnessDisplay(args.value); },
-        drag: function(args) { updateRestfulnessDisplay(args.value); }
-    });
-    // Focus Slider
-    $("#focusSliderContainer").roundSlider({
-        ...sliderOptions,
-        tooltipFormat: function() { return "Focus"; },
-        create: function(args) { updateFocusDisplay(args.value); },
-        valueChange: function(args) { updateFocusDisplay(args.value); },
-        drag: function(args) { updateFocusDisplay(args.value); }
-    });
+        console.log("Round sliders initialized with dynamic handle AND range color.");
+    }
 
-    console.log("Round sliders re-initialized (circleShape: pie, type: min-range, top semi-circle angles).");}
-
-    // --- 7. Pagination Logic (Keep as is) ---
+    // --- 7. Pagination Logic ---
     function showPage(index) {
         pages.forEach((page, i) => page.classList.toggle('active', i === index));
         prevBtn.disabled = (index === 0);
         nextBtn.style.display = (index === totalPages - 1) ? 'none' : 'inline-block';
         submitButton.style.display = (index === totalPages - 1) ? 'inline-block' : 'none';
         currentPageIndex = index;
-        console.log(`Showing page ${currentPageIndex}`);
+        // console.log(`Showing page ${currentPageIndex}`);
     }
     function navigatePage(direction) {
         let newIndex = currentPageIndex + direction;
@@ -127,90 +189,50 @@ $(document).ready(function() {
 
     // --- 8. Form Submission (SEND TO SERVER) ---
     checkinForm.addEventListener('submit', (event) => {
-        event.preventDefault(); // Prevent default page reload
-
-        // Create the check-in data object (using 0-100 values)
+        event.preventDefault();
         const checkInData = {
-            timestamp: new Date().toISOString(), // UTC Standard
-            mood: parseInt(moodValueInputEl.value),
-            energy: parseInt(energyValueInputEl.value),
-            anxiety: parseInt(anxietyValueInputEl.value),
-            sleep_hours: parseFloat(sleepHoursInput.value) || 0,
-            sleep_restfulness: parseInt(restfulnessValueInputEl.value),
-            focus: parseInt(focusValueInputEl.value),
+            timestamp: new Date().toISOString(),
+            mood: parseInt(moodValueInputEl.value), energy: parseInt(energyValueInputEl.value), anxiety: parseInt(anxietyValueInputEl.value),
+            sleep_hours: parseFloat(sleepHoursInput.value) || 0, sleep_restfulness: parseInt(restfulnessValueInputEl.value), focus: parseInt(focusValueInputEl.value),
             notes: notesTextarea.value.trim()
         };
 
-        // --- NEW: Send data to server using fetch ---
         console.log("Attempting to send data to server:", checkInData);
-        submitButton.disabled = true; // Disable button during submission
-        submitButton.textContent = 'Saving...';
+        submitButton.disabled = true; submitButton.textContent = 'Saving...';
 
-        fetch('save_checkin.php', { // URL of your PHP script on the SAME server
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json', // Tell server we're sending JSON
-                'Accept': 'application/json'       // Tell server we expect JSON back
-            },
-            body: JSON.stringify(checkInData) // Convert JS object to JSON string
+        fetch('save_checkin.php', {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(checkInData)
         })
         .then(response => {
-            // Check if the response status indicates success (e.g., 200 OK)
-            if (!response.ok) {
-                 // If server response is not ok, try to get error message, then throw
-                 return response.json().catch(() => { // Try parsing JSON error first
-                      throw new Error(`Server responded with status ${response.status}`);
-                 }).then(errorData => {
-                     throw new Error(errorData.message || `Server responded with status ${response.status}`);
-                 });
-            }
-            return response.json(); // Parse the JSON response from PHP
+            if (!response.ok) { return response.json().catch(() => { throw new Error(`Server responded with status ${response.status}`); }).then(errorData => { throw new Error(errorData.message || `Server responded with status ${response.status}`); }); }
+            return response.json();
         })
         .then(data => {
-            // Check the status message from our PHP script
             if (data.status === 'success') {
-                console.log("Server confirmed save:", data.message);
-                alert("Check-in saved! 🎉");
+                console.log("Server confirmed save:", data.message); alert("Check-in saved! 🎉");
+                // Reset form
+                moodValueInputEl.value = 50; energyValueInputEl.value = 50; anxietyValueInputEl.value = 50; restfulnessValueInputEl.value = 50; focusValueInputEl.value = 50;
+                sleepHoursInput.value = 8; notesTextarea.value = '';
+                // Also reset slider visuals
+                $("#moodSliderInstance").roundSlider("option", "value", 50); $("#energySliderInstance").roundSlider("option", "value", 50); $("#anxietySliderInstance").roundSlider("option", "value", 50); $("#restfulnessSliderInstance").roundSlider("option", "value", 50); $("#focusSliderInstance").roundSlider("option", "value", 50);
+                 // Explicitly update colors for reset value (might be needed if 'create' doesn't fire on reset)
+                 updateSliderColors($("#moodSliderInstance").data("roundSlider"), 50);
+                 updateSliderColors($("#energySliderInstance").data("roundSlider"), 50);
+                 updateSliderColors($("#anxietySliderInstance").data("roundSlider"), 50);
+                 updateSliderColors($("#restfulnessSliderInstance").data("roundSlider"), 50);
+                 updateSliderColors($("#focusSliderInstance").data("roundSlider"), 50);
 
-                // --- Reset form (same logic as before) ---
-                 moodValueInputEl.value = 50;
-                 energyValueInputEl.value = 50;
-                 anxietyValueInputEl.value = 50;
-                 restfulnessValueInputEl.value = 50;
-                 focusValueInputEl.value = 50;
-                 sleepHoursInput.value = 8;
-                 notesTextarea.value = '';
-
-                 $("#moodSliderContainer").roundSlider("option", "value", 50);
-                 $("#energySliderContainer").roundSlider("option", "value", 50);
-                 $("#anxietySliderContainer").roundSlider("option", "value", 50);
-                 $("#restfulnessSliderContainer").roundSlider("option", "value", 50);
-                 $("#focusSliderContainer").roundSlider("option", "value", 50);
-
-                 showPage(0); // Navigate back to the first page
-
-            } else {
-                 // Server reported an error in its JSON response
-                 throw new Error(data.message || 'Server reported an unspecified error.');
-            }
+                showPage(0); // Navigate back to first page
+            } else { throw new Error(data.message || 'Server reported an unspecified error.'); }
         })
-        .catch(error => {
-            // Handle network errors or errors thrown from .then blocks
-            console.error("Error saving check-in data:", error);
-            alert(`Sorry, there was an error saving your check-in: ${error.message}`);
-        })
-        .finally(() => {
-             // Re-enable button regardless of success or failure
-             submitButton.disabled = false;
-             submitButton.textContent = 'Done! ✅';
-        });
+        .catch(error => { console.error("Error saving check-in data:", error); alert(`Sorry, there was an error saving your check-in: ${error.message}`); })
+        .finally(() => { submitButton.disabled = false; submitButton.textContent = 'Done! ✅'; });
     }); // End of submit listener
 
-
-    // --- 9. Initial Setup (Keep as is) ---
+    // --- 9. Initial Setup ---
     initializeSliders();
     showPage(0);
-
     console.log("Check-in page initialized.");
 
 }); // End of jQuery $(document).ready
